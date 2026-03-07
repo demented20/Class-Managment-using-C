@@ -54,7 +54,7 @@
 
     Header* array_delete_element(Header* meta_data,long int student_id){
         if (meta_data==NULL) return NULL; //handles invalid pointer 
-        if (meta_data->count == 0 ) return NULL;// handles empty arrays 
+        if (meta_data->count == 0 ) return meta_data;// handles empty arrays - return unchanged
 
         int index = -1; //way of simulating the boolean and at the same time returning the index if student id is found found
         for (int i = 0; i < meta_data->count; i++){
