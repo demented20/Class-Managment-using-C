@@ -213,7 +213,7 @@ A comprehensive code quality review and refactoring pass was performed to improv
 **Memory Safety Fixes:**
 - Replaced VLA (Variable Length Array) with dynamic allocation using `malloc()`
   - Old: `int indices[count];` (C99 VLA, not portable)
-  - New: `int *indices = (int *)malloc(count * sizeof(int));` (portable, C89 compatible)
+  - New: `int *indices = (int *)malloc(count * sizeof(int));` (portable, C99 compatible)
 - Added NULL check after malloc to prevent NULL pointer dereference
 - Proper memory cleanup with `free(indices)` after ranking display
 - Memory allocation failure handling with user-friendly error message
@@ -243,7 +243,7 @@ A comprehensive code quality review and refactoring pass was performed to improv
 ### Benefits of These Changes
 
 1. **Robustness**: Input validation prevents invalid data from causing crashes or unexpected behavior
-2. **Portability**: Removed VLA dependency, now fully C89 compatible
+2. **Portability**: Removed VLA dependency, now fully C99 compatible
 3. **Maintainability**: Clear, comprehensive comments make code easier to understand
 4. **Safety**: Proper NULL checks and error handling throughout
 5. **Consistency**: Uniform coding style and formatting across all files
@@ -283,7 +283,7 @@ fix: improve code quality, edge cases, and comments
 
 - Add comprehensive input validation with scanf return checks
 - Fix floating-point edge cases (FLT_MAX instead of hardcoded values)
-- Replace VLA with malloc for C89 portability
+- Replace VLA with malloc for C99 portability
 - Add proper memory allocation error handling
 - Fix sign/unsigned comparison warnings
 - Improve all code comments for clarity

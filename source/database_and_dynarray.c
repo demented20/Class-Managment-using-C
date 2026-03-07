@@ -29,7 +29,8 @@ Header *make_array(int init_capacity){
         if (header->count >= (int)header->capacity){
             int new_capacity = (int)(header->capacity * 1.5);
             Header *new_header = realloc(header, sizeof(Header) + sizeof(Students) * new_capacity);
-            if (new_header == NULL) return pointer_to_first_student;     
+            // Return NULL so caller can detect allocation failure safely.
+            if (new_header == NULL) return NULL;
             // Update metadata after realloc
             new_header->capacity = new_capacity;
             new_header->items = (Students*)(new_header + 1);

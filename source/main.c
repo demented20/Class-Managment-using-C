@@ -40,7 +40,7 @@ Header * Make_a_class()
 
 // Collect and validate student information from user input
 Students fill_student_info() {
-    Students student;
+    Students student = {0};
     int input_result;
     
     // Validate student ID (must be positive)
@@ -62,7 +62,12 @@ Students fill_student_info() {
     // Validate student name (must not be empty)
     do {
         printf("  Enter student name : ");
-        fgets(student.name, sizeof(student.name), stdin);
+        // Stop add operation if input stream is unavailable.
+        if (fgets(student.name, sizeof(student.name), stdin) == NULL) {
+            printf("  ✗ Failed to read student name. Operation cancelled.\n");
+            student.stud_id = 0;
+            return student;
+        }
         student.name[strcspn(student.name, "\n")] = '\0';  // Remove newline
         if (strlen(student.name) == 0) {
             printf("  ✗ Name cannot be empty. Try again.\n");
@@ -73,6 +78,12 @@ Students fill_student_info() {
     printf("  Enter 5 grades (space separated) : ");
     for (int i = 0; i < 5; i++) {
         input_result = scanf("%f", &student.grades_array[i]);
+        // EOF means no more input; leave current operation and return to menu.
+        if (input_result == EOF) {
+            printf("\n  ✗ End of input detected. Operation cancelled.\n");
+            student.stud_id = 0;
+            return student;
+        }
         if (input_result != 1) {
             clear_input();
             printf("  ✗ Invalid grade input. Re-enter grade %d: ", i + 1);
@@ -137,6 +148,11 @@ int main (){
 
             case 1: {
                 Students student = fill_student_info();
+
+                if (student.stud_id <= 0) {
+                    printf("\n  Add student cancelled.\n");
+                    break;
+                }
                 
                 // Verify class is valid
                 if (Class == NULL) {
@@ -158,6 +174,10 @@ int main (){
                     printf("\n  ✗ Student ID already exists. Cannot add duplicate.\n");
                 } else {
                     Students *new_ptr = _array_push((Students *)(Class + 1), student);
+                    if (new_ptr == NULL) {
+                        printf("\n  ✗ Failed to add student (memory allocation error).\n");
+                        break;
+                    }
                     // update class pointer in case realloc moved the block
                     Class = ((Header *)new_ptr) - 1;
                     printf("\n  ✓ Student added. (%d/%d)\n", Class->count, (int)Class->capacity);
