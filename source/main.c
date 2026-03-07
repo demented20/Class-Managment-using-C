@@ -39,17 +39,36 @@ Header * Make_a_class()
 
 Students fill_student_info() {
     Students student;
-    printf("\n  Enter student ID   : ");
-    scanf("%ld", &student.stud_id);
-    clear_input();
+    
+    // Validate student ID (must be positive)
+    do {
+        printf("\n  Enter student ID   : ");
+        scanf("%ld", &student.stud_id);
+        clear_input();
+        if (student.stud_id <= 0) {
+            printf("  ✗ Student ID must be positive. Try again.\n");
+        }
+    } while (student.stud_id <= 0);
 
-    printf("  Enter student name : ");
-    fgets(student.name, sizeof(student.name), stdin);
-    student.name[strcspn(student.name, "\n")] = '\0'; // to capture the first and last name  
+    // Validate student name (must not be empty)
+    do {
+        printf("  Enter student name : ");
+        fgets(student.name, sizeof(student.name), stdin);
+        student.name[strcspn(student.name, "\n")] = '\0'; // to capture the first and last name
+        if (strlen(student.name) == 0) {
+            printf("  ✗ Name cannot be empty. Try again.\n");
+        }
+    } while (strlen(student.name) == 0);
 
+    // Validate grades (must be 0-100)
     printf("  Enter 5 grades (space separated) : ");
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++) {
         scanf("%f", &student.grades_array[i]);
+        if (student.grades_array[i] < 0 || student.grades_array[i] > 100) {
+            printf("  ✗ Grade must be between 0-100. Re-enter grade %d: ", i + 1);
+            i--; // Retry this grade
+        }
+    }
     clear_input();
 
     float avg = calculate_average(student.grades_array);
@@ -67,7 +86,7 @@ void first_prompt(){
 
 int main (){
     //class creation loop
-    int user_input;
+    int user_input = 0;
     while(user_input!= 1){
        first_prompt();
        scanf("\n%d",&user_input);
@@ -86,10 +105,25 @@ int main (){
 
             case 1: {
                 Students student = fill_student_info();
-                Students *new_ptr = _array_push((Students *)(Class + 1), student);
-                // update class pointer in case realloc moved the block
-                Class = ((Header *)new_ptr) - 1;
-                printf("\n  ✓ Student added. (%d/%d)\n", Class->count, (int)Class->capacity);
+                
+                // Check for duplicate student ID
+                Students *arr = (Students *)(Class + 1);
+                int duplicate = 0;
+                for (int i = 0; i < Class->count; i++) {
+                    if (arr[i].stud_id == student.stud_id) {
+                        duplicate = 1;
+                        break;
+                    }
+                }
+                
+                if (duplicate) {
+                    printf("\n  ✗ Student ID already exists. Cannot add duplicate.\n");
+                } else {
+                    Students *new_ptr = _array_push((Students *)(Class + 1), student);
+                    // update class pointer in case realloc moved the block
+                    Class = ((Header *)new_ptr) - 1;
+                    printf("\n  ✓ Student added. (%d/%d)\n", Class->count, (int)Class->capacity);
+                }
                 break;
             }
 
