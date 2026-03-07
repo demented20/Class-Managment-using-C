@@ -9,6 +9,7 @@
 
 //xxxxxxxxxxxxxxxxxxxx Functions xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+// Clear leftover input from stdin buffer
 void clear_input() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -30,23 +31,31 @@ void print_main_menu() {
     printf("  user_input : ");
 }
 
+// Initialize a new class with minimum capacity
 Header * Make_a_class()
 {
-    Header *pointeur =make_array(MIN_CAPACITY);
+    Header *pointeur = make_array(MIN_CAPACITY);
     return pointeur;
 }
-// this function simulates a constructor and fills the necessary information before pushing it into the database array
 
+// Collect and validate student information from user input
 Students fill_student_info() {
     Students student;
+    int input_result;
     
     // Validate student ID (must be positive)
     do {
         printf("\n  Enter student ID   : ");
-        scanf("%ld", &student.stud_id);
-        clear_input();
-        if (student.stud_id <= 0) {
-            printf("  ✗ Student ID must be positive. Try again.\n");
+        input_result = scanf("%ld", &student.stud_id);
+        if (input_result != 1) {
+            clear_input();
+            printf("  ✗ Invalid input. Please enter a valid ID.\n");
+            student.stud_id = 0;
+        } else {
+            clear_input();
+            if (student.stud_id <= 0) {
+                printf("  ✗ Student ID must be positive. Try again.\n");
+            }
         }
     } while (student.stud_id <= 0);
 
@@ -54,7 +63,7 @@ Students fill_student_info() {
     do {
         printf("  Enter student name : ");
         fgets(student.name, sizeof(student.name), stdin);
-        student.name[strcspn(student.name, "\n")] = '\0'; // to capture the first and last name
+        student.name[strcspn(student.name, "\n")] = '\0';  // Remove newline
         if (strlen(student.name) == 0) {
             printf("  ✗ Name cannot be empty. Try again.\n");
         }
@@ -63,10 +72,16 @@ Students fill_student_info() {
     // Validate grades (must be 0-100)
     printf("  Enter 5 grades (space separated) : ");
     for (int i = 0; i < 5; i++) {
-        scanf("%f", &student.grades_array[i]);
+        input_result = scanf("%f", &student.grades_array[i]);
+        if (input_result != 1) {
+            clear_input();
+            printf("  ✗ Invalid grade input. Re-enter grade %d: ", i + 1);
+            i--;  // Retry this grade
+            continue;
+        }
         if (student.grades_array[i] < 0 || student.grades_array[i] > 100) {
             printf("  ✗ Grade must be between 0-100. Re-enter grade %d: ", i + 1);
-            i--; // Retry this grade
+            i--;  // Retry this grade
         }
     }
     clear_input();
@@ -78,33 +93,56 @@ Students fill_student_info() {
     return student;
 }
 
+// Prompt user to create a class
 void first_prompt(){
-    printf("You first need to create a class");
-    printf("You can do this by entering : 1 ");
+    printf("\n  You first need to create a class.\n");
+    printf("  Enter 1 to create a class: ");
 }
 //xxxxxxxxxxxxxxxxxxxx Main Function xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 int main (){
-    //class creation loop
+    // Class creation loop - validate input
     int user_input = 0;
-    while(user_input!= 1){
-       first_prompt();
-       scanf("\n%d",&user_input);
+    int input_result;
+    while(user_input != 1){
+        first_prompt();
+        input_result = scanf("%d", &user_input);
+        if (input_result != 1) {
+            clear_input();
+            printf("  ✗ Invalid input. Please enter 1.\n");
+            user_input = 0;
+        }
     }
-    Make_a_class();
+    
+    // Create and initialize the class
     Header * Class = Make_a_class();
-    printf("You Have successfully created a class ! ");
+    if (Class == NULL) {
+        printf("\n  ✗ Failed to create class. Exiting.\n");
+        return 1;
+    }
+    printf("\n  ✓ Class created successfully!\n");
 
-    //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx MAIN MENU  xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    // Main menu loop
     while (1) {
         print_main_menu();
-        scanf("%d", &user_input);
+        input_result = scanf("%d", &user_input);
+        if (input_result != 1) {
+            clear_input();
+            printf("\n  ✗ Invalid input. Please try again.\n");
+            continue;
+        }
         clear_input();
 
         switch (user_input) {
 
             case 1: {
                 Students student = fill_student_info();
+                
+                // Verify class is valid
+                if (Class == NULL) {
+                    printf("\n  ✗ Class is invalid. Exiting.\n");
+                    return 1;
+                }
                 
                 // Check for duplicate student ID
                 Students *arr = (Students *)(Class + 1);
@@ -130,7 +168,12 @@ int main (){
             case 2: {
                 long int id;
                 printf("\n  Enter student ID to delete : ");
-                scanf("%ld", &id);
+                input_result = scanf("%ld", &id);
+                if (input_result != 1) {
+                    clear_input();
+                    printf("  ✗ Invalid ID format.\n");
+                    break;
+                }
                 clear_input();
                 int prev = Class->count;
                 Class = array_delete_element(Class, id);
@@ -144,7 +187,12 @@ int main (){
             case 3: {
                 long int id;
                 printf("\n  Enter student ID : ");
-                scanf("%ld", &id);
+                input_result = scanf("%ld", &id);
+                if (input_result != 1) {
+                    clear_input();
+                    printf("  ✗ Invalid ID format.\n");
+                    break;
+                }
                 clear_input();
                 Students *arr = (Students *)(Class + 1);
                 int found = 0;
@@ -185,8 +233,8 @@ int main (){
                 break;
 
             case 0:
-                free_the_array(Class);
-                printf("\n  Goodbye.\n\n");
+                if (Class != NULL) free_the_array(Class);
+                printf("\n  ✓ Goodbye!\n\n");
                 return 0;
 
             default:
