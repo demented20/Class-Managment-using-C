@@ -277,3 +277,18 @@ The next step is to expand the feature set with more advanced functionality, and
 ## Author
 
 **Madani Alaoui Youness** — [@demented20](https://github.com/demented20)
+
+
+fix: improve code quality, edge cases, and comments
+
+- Add comprehensive input validation with scanf return checks
+- Fix floating-point edge cases (FLT_MAX instead of hardcoded values)
+- Replace VLA with malloc for C89 portability
+- Add proper memory allocation error handling
+- Fix sign/unsigned comparison warnings
+- Improve all code comments for clarity
+- Remove duplicate function calls
+- Add NULL pointer checks after malloc
+- Enhance user feedback with consistent error symbols
+- Resolve typos: 'swwapping' -> 'swapping', 'upadate' -> 'update'
+- Document all changes in README.md
