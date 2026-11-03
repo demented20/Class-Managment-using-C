@@ -79,7 +79,7 @@ The core data structure of this project is a contiguous memory block laid out as
           pointer returned to the caller
 ```
 
-The `Header` struct holds the metadata of the array — `count`, `capacity`, and `items` — and is allocated immediately before the student data in a single `malloc` call:
+The `Header` struct holds the metadata of the array — `count`, `capacity`, and `items` and is allocated immediately before the student data in a single `malloc` call:
 
 ```c
 Header *h = malloc(sizeof(Header) + sizeof(Students) * capacity);
@@ -91,7 +91,7 @@ The caller only ever holds a pointer to the first student (`Students *`), and th
 Header *header = ((Header *)pointer_to_first_student) - 1;
 ```
 
-This design is inspired by how some real-world allocators and string implementations (like C++'s `std::string` in certain implementations) embed metadata directly before the data pointer. The main advantage is **locality** — the metadata and the data live in the same memory block, so there is no extra pointer indirection and no risk of the two getting out of sync. The tradeoff is that the caller must always reassign their pointer after any operation that may trigger a `realloc`, since the entire block can move to a new address.
+This design is inspired by how some real-world allocators and string implementations (like C++'s `std::string` in certain implementations) embed metadata directly before the data pointer. The main advantage is **locality** the metadata and the data live in the same memory block, so there is no extra pointer indirection and no risk of the two getting out of sync. The tradeoff is that the caller must always reassign their pointer after any operation that may trigger a `realloc`, since the entire block can move to a new address.
 
 ---
 
@@ -124,7 +124,7 @@ if (count < capacity / 2 && capacity > MIN_CAPACITY) {
 }
 ```
 
-A minimum capacity floor of `32` is enforced — the array never shrinks below 32 slots. This prevents degenerate behavior at small sizes, particularly important because the growth strategy uses `capacity * 1.5`, which truncates to the same value at very small capacities and could cause an infinite realloc loop without the floor.
+A minimum capacity floor of `32` is enforced the array never shrinks below 32 slots. This prevents degenerate behavior at small sizes, particularly important because the growth strategy uses `capacity * 1.5`, which truncates to the same value at very small capacities and could cause an infinite realloc loop without the floor.
 
 The shrink feature is wrapped in a `#ifdef FREE_UNNECESSARY_CAPACITY` macro, making it **opt-in**. If memory usage is not a concern, simply comment out the `#define` and the array will never shrink, which slightly improves performance in scenarios with frequent add/delete cycles.
 
@@ -139,9 +139,9 @@ The shrink feature is wrapped in a `#ifdef FREE_UNNECESSARY_CAPACITY` macro, mak
 ---
 ## Notes
 
-- Grades are stored as `float` — letter grades are computed from the integer part of the average
+- Grades are stored as `float` letter grades are computed from the integer part of the average
 - Student names support spaces (captured with `fgets`)
-- All functions return the (possibly new) `Header *` after any `realloc` — the caller must always reassign their pointer after a push or delete
+- All functions return the (possibly new) `Header *` after any `realloc` the caller must always reassign their pointer after a push or delete
 ---
 
 
@@ -153,11 +153,11 @@ After learning C through online documentation, I wanted to move beyond reading a
 
 ### What I Learned
 
-My main goal going in was to avoid simply reusing existing data structures and instead think about the problem from a different angle. That led me to the header-array approach — embedding the array's metadata directly before the data in memory — which turned out to be one of the most interesting parts of the project , an other interesting point worth mentionning is that this project was not just to make the code work, but to make it work efficiently. For example, deletion is handled by swapping the target element with the last one in the array - an O(1) operation — rather than shifting all subsequent elements left, which would be O(n). Working in C forced me to think carefully about every byte: how memory is laid out, when it moves, and what that means for every pointer in the program. It also pushed me to think outside the object-oriented perspective — there are no classes, no constructors, no automatic cleanup — and yet it is still possible to write code that is well-structured, readable, and solid. That shift in thinking was probably the most valuable thing I took away from this.
+My main goal going in was to avoid simply reusing existing data structures and instead think about the problem from a different angle. That led me to the header-array approach embedding the array's metadata directly before the data in memory which turned out to be one of the most interesting parts of the project , an other interesting point worth mentionning is that this project was not just to make the code work, but to make it work efficiently. For example, deletion is handled by swapping the target element with the last one in the array ;an O(1) operation rather than shifting all subsequent elements left, which would be O(n). Working in C forced me to think carefully about every byte: how memory is laid out, when it moves, and what that means for every pointer in the program. It also pushed me to think outside the object-oriented perspective there are no classes, no constructors, no automatic cleanup and yet it is still possible to write code that is well-structured, readable, and solid. That shift in thinking was probably the most valuable thing I took away from this.
 
 ### Future Plans
 
-The next step is to expand the feature set with more advanced functionality, and eventually add a graphical interface using a library like **GTK** to give the program a proper GUI layer. The core data structure is already solid enough to build on — the goal is to keep extending it without compromising the simplicity of the current design.
+The next step is to expand the feature set with more advanced functionality, and eventually add a graphical interface using a library like **GTK** to give the program a proper GUI layer. The core data structure is already solid enough to build on the goal is to keep extending it without compromising the simplicity of the current design.
 
 ---
 
