@@ -136,6 +136,119 @@ The shrink feature is wrapped in a `#ifdef FREE_UNNECESSARY_CAPACITY` macro, mak
 |---|---|---|
 | `MIN_CAPACITY` | `32` | Minimum array capacity, never shrinks below this |
 | `FREE_UNNECESSARY_CAPACITY` | defined | Enables automatic shrinking when count < capacity/2 |
+
+---
+
+## Recent Code Improvements (March 2026)
+
+### Overview
+A comprehensive code quality review and refactoring pass was performed to improve robustness, fix edge cases, and clean up comments throughout the codebase.
+
+### Changes by File
+
+#### **main.c**
+**Input Validation & Error Handling:**
+- Added `scanf()` return value checking for all user inputs to prevent infinite loops on invalid input
+- Grade input validation now checks both data type validity and range (0-100)
+- First prompt now validates user input for class creation (only accepts 1)
+- Added NULL pointer check after class creation to catch memory allocation failures
+- Invalid input now displays user-friendly error message with ✗ symbol
+
+**Function Improvements:**
+- Removed duplicate `Make_a_class()` call that was wasting memory
+- Added comment to `clear_input()`: "Clear leftover input from stdin buffer"
+- Added comment to `Make_a_class()`: "Initialize a new class with minimum capacity"
+- Added comment to `fill_student_info()`: "Collect and validate student information from user input"
+- Improved `first_prompt()` with proper newline formatting and clearer messaging
+- All scanf operations now validate return values before proceeding
+
+**Menu Loop:**
+- Added input validation to main menu to prevent invalid option handling
+- Displays ✓ symbol for successful operations and ✗ for errors
+- Improved user feedback with consistent formatting
+
+#### **database_and_dynarray.c**
+**Edge Case Fixes:**
+- Cast `header->count` to `(int)` to eliminate signed/unsigned comparison warning
+- Cast capacity division to `(int)` for consistent type comparison
+- Improved robustness of shrinking logic
+
+**Comment Improvements:**
+- Clarified `make_array()` function purpose: "Create and initialize a dynamic array with initial capacity"
+- Added proper documentation for macro section: "Configuration macros"
+- Fixed typo: "xxxxxxxxxxxxx function implementations" → cleaned up header comments
+- Improved clarity of metadata initialization comments
+- Documented array memory layout in comments
+- Fixed "swwapping" typo → "Swap with last element"
+- Fixed "upadate" typo → "Update metadata"
+
+**Code Organization:**
+- Better indentation consistency
+- Clearer variable naming in comments
+- Restructured comments for readability
+
+#### **student.c**
+**Comment Improvements:**
+- Added function-level documentation comments for all functions:
+  - `calculate_average()`: "Calculate average of 5 grades"
+  - `display_student_info()`: "Display basic student info (name, ID, average)"
+  - `display_all_student_info()`: "Display complete student info including all grades and letter grade"
+  - `make_letter_grade_class()`: "Convert numeric average to letter grade (A=90+, B=80+, C=70+, D=60+, F=below 60)"
+
+**Output Formatting:**
+- Improved printf output format with consistent indentation and spacing
+- Changed "student Name" → "Name" (removed redundant prefix)
+- Added proper formatting with 2 decimal places for grades
+- Better alignment and readability of output
+
+**Code Quality:**
+- Improved variable spacing (e.g., `sum=0` → `sum = 0`)
+- Better code consistency throughout
+
+#### **other_features.c**
+**Major Improvements:**
+- Added `#include <stdlib.h>` for malloc/free functions
+- Added `#include <float.h>` for FLT_MAX constant
+
+**Memory Safety Fixes:**
+- Replaced VLA (Variable Length Array) with dynamic allocation using `malloc()`
+  - Old: `int indices[count];` (C99 VLA, not portable)
+  - New: `int *indices = (int *)malloc(count * sizeof(int));` (portable, C99 compatible)
+- Added NULL check after malloc to prevent NULL pointer dereference
+- Proper memory cleanup with `free(indices)` after ranking display
+- Memory allocation failure handling with user-friendly error message
+
+**Floating-Point Edge Cases:**
+- Fixed `lowest` initialization: `lowest = 101` → `lowest = FLT_MAX`
+- Fixed `highest` initialization: `highest = -1` → `highest = -FLT_MAX`
+- This prevents edge cases where all grades happen to be above/below the hardcoded values
+
+**Function Documentation:**
+- Added comprehensive comments for all three functions:
+  - `display_class_averages()`: "Display average grade for each subject across all students"
+  - `display_class_stats()`: "Display class statistics (highest/lowest student average, class average)"
+  - `display_ranking()`: "Display ranked list of students sorted by average grade (highest to lowest)"
+
+**Code Clarity:**
+- Improved inline comments explaining the sorting algorithm
+- Better spacing and indentation for readability
+- Clearer variable names in comments
+
+### Compilation Status
+
+✅ **Clean build** with no errors or warnings  
+✅ Compiles with: `gcc -Wall -Wextra -o ClassManagement source/*.c`  
+✅ Executable runs without issues
+
+### Benefits of These Changes
+
+1. **Robustness**: Input validation prevents invalid data from causing crashes or unexpected behavior
+2. **Portability**: Removed VLA dependency, now fully C99 compatible
+3. **Maintainability**: Clear, comprehensive comments make code easier to understand
+4. **Safety**: Proper NULL checks and error handling throughout
+5. **Consistency**: Uniform coding style and formatting across all files
+6. **Correctness**: Fixed edge cases with proper use of floating-point constants
+
 ---
 ## Notes
 
@@ -164,3 +277,18 @@ The next step is to expand the feature set with more advanced functionality, and
 ## Author
 
 **Madani Alaoui Youness** — [@demented20](https://github.com/demented20)
+
+
+fix: improve code quality, edge cases, and comments
+
+- Add comprehensive input validation with scanf return checks
+- Fix floating-point edge cases (FLT_MAX instead of hardcoded values)
+- Replace VLA with malloc for C99 portability
+- Add proper memory allocation error handling
+- Fix sign/unsigned comparison warnings
+- Improve all code comments for clarity
+- Remove duplicate function calls
+- Add NULL pointer checks after malloc
+- Enhance user feedback with consistent error symbols
+- Resolve typos: 'swwapping' -> 'swapping', 'upadate' -> 'update'
+- Document all changes in README.md
